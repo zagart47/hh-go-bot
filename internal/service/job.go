@@ -1,12 +1,11 @@
-package job
+package service
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"hh-go-bot/config"
-	"hh-go-bot/internal/model/job"
-	"hh-go-bot/internal/service/tool"
+	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/model"
 	"io"
 	"net/http"
 	"os"
@@ -14,16 +13,16 @@ import (
 )
 
 type Job interface {
-	All() job.VacancyList
-	Message(job.VacancyList) []string
+	All() model.VacancyList
+	Message(model.VacancyList) []string
 }
 
 type jobService struct {
 	job  Job
-	tool tool.Converter
+	tool Converter
 }
 
-func (js jobService) Message(vacancyList job.VacancyList) []string {
+func (js jobService) Message(vacancyList model.VacancyList) []string {
 	var message string
 	var messageList []string
 	var count int
@@ -43,20 +42,20 @@ func (js jobService) Message(vacancyList job.VacancyList) []string {
 	return nil
 }
 
-func NewMainService() jobService {
+func NewService() jobService {
 	return jobService{
 		jobService{},
-		tool.Service{},
+		toolService{},
 	}
 }
 
-func (js jobService) MapToSlice(m map[string]job.Vacancy) job.VacancyList {
+func (js jobService) MapToSlice(m map[string]model.Vacancy) model.VacancyList {
 	return js.tool.MapToSlice(m)
 }
 
-func (js jobService) All() job.VacancyList {
-	listMap := make(map[string]job.Vacancy)
-	var list job.VacancyList
+func (js jobService) All() model.VacancyList {
+	listMap := make(map[string]model.Vacancy)
+	var list model.VacancyList
 	for i := 0; ; i++ {
 		url := fmt.Sprintf("https://api.hh.ru/vacancies?text=golang&area=113&id=publication_time&page=%d", i)
 		resp, err := http.Get(url)
@@ -86,9 +85,9 @@ func (js jobService) All() job.VacancyList {
 	return js.MapToSlice(listMap)
 }
 
-func (js jobService) Similar() job.VacancyList {
-	listMap := make(map[string]job.Vacancy)
-	var list job.VacancyList
+func (js jobService) Similar() model.VacancyList {
+	listMap := make(map[string]model.Vacancy)
+	var list model.VacancyList
 	var link string
 	for i := 0; ; i++ {
 		buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))

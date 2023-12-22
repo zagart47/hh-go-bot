@@ -1,4 +1,4 @@
-package job
+package model
 
 type Employer struct {
 	Name string `json:"name"`

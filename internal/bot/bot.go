@@ -2,9 +2,9 @@ package bot
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"hh-go-bot/config"
-	"hh-go-bot/internal/model/job"
-	job2 "hh-go-bot/internal/service/job"
+	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/model"
+	"hh-go-bot/internal/service"
 	"log"
 	"time"
 )
@@ -26,8 +26,8 @@ func (tg Bot) Start() {
 	u := tgbotapi.NewUpdate(0)
 	updates := tg.bot.GetUpdatesChan(u)
 
-	jobService := job2.NewMainService()
-	vacancies := job.NewVacancyList()
+	jobService := service.NewService()
+	vacancies := model.NewVacancyList()
 	for update := range updates {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 		msg.DisableWebPagePreview = true

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"hh-go-bot/bot"
-	"hh-go-bot/config"
+	"hh-go-bot/internal/bot"
+	"hh-go-bot/internal/config"
 )
 
 func main() {

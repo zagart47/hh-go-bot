@@ -1,6 +1,6 @@
-package applied
+package model
 
-type Vacancy struct {
+type AppliedVacancy struct {
 	Items   []Item  `json:"items"`
 	Found   int64   `json:"found"`
 	Pages   int64   `json:"pages"`
@@ -8,7 +8,7 @@ type Vacancy struct {
 	PerPage int64   `json:"per_page"`
 	Overall Overall `json:"overall"`
 }
-type VacancyList []Vacancy
+type AppliedVacancies []AppliedVacancy
 
 type Item struct {
 	LastName           string          `json:"last_name"`
