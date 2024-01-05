@@ -1,33 +1,28 @@
-package bot
+package telegrambot
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"hh-go-bot/internal/config"
-	"hh-go-bot/internal/model"
+	"hh-go-bot/internal/entity"
 	"hh-go-bot/internal/service"
-	"log"
 	"time"
 )
 
-type Bot struct {
-	bot tgbotapi.BotAPI
-}
-
-func NewBot(cfg config.Config) Bot {
-	bot, err := tgbotapi.NewBotAPI(cfg.Token)
+func New(token string) (*tgbotapi.BotAPI, error) {
+	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
-	return Bot{bot: *bot}
+	return bot, nil
 }
 
-func (tg Bot) Start() {
-	tg.bot.Debug = true
+func Start(bot *tgbotapi.BotAPI) (err error) {
+	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
-	updates := tg.bot.GetUpdatesChan(u)
+	updates := bot.GetUpdatesChan(u)
 
 	jobService := service.NewService()
-	vacancies := model.NewVacancyList()
+	vacancies := entity.NewVacancyList()
+
 	for update := range updates {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 		msg.DisableWebPagePreview = true
@@ -42,10 +37,11 @@ func (tg Bot) Start() {
 		vacs := jobService.Message(vacancies)
 		for _, v := range vacs {
 			msg.Text = v
-			if _, err := tg.bot.Send(msg); err != nil {
-				log.Panic(err)
+			if _, err = bot.Send(msg); err != nil {
+				return
 			}
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
+	return
 }

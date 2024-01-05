@@ -5,31 +5,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"hh-go-bot/internal/config"
-	"hh-go-bot/internal/model"
+	"hh-go-bot/internal/entity"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 )
 
 type Job interface {
-	All() model.VacancyList
-	Message(model.VacancyList) []string
+	All() entity.VacancyList
+	Message(entity.VacancyList) []string
 }
 
 type jobService struct {
-	job  Job
-	tool Converter
+	job       Job
+	converter Converter
 }
 
-func (js jobService) Message(vacancyList model.VacancyList) []string {
+func (s jobService) Message(vacancyList entity.VacancyList) []string {
 	var message string
 	var messageList []string
 	var count int
 	for _, v := range vacancyList.Items {
-		message = fmt.Sprintf("%s\n%s | %s - %s", message, v.Employer.Name, v.Name, v.AlternateUrl)
+		message = fmt.Sprintf("%s\n%c %s | %s - %s", message, v.Applied, v.Employer.Name, v.Name, v.AlternateUrl)
 		count++
-		if count == 40 { // примерно 40 вакансий - оптимальное количество вакансий для непревышения лимита символов в одном сообщении (4096)
+		if count == 40 { // 40 вакансий - примерное оптимальное количество для непревышения лимита символов в одном сообщении (4096)
 			messageList = append(messageList, message)
 			count = 0
 			message = ""
@@ -49,13 +50,9 @@ func NewService() jobService {
 	}
 }
 
-func (js jobService) MapToSlice(m map[string]model.Vacancy) model.VacancyList {
-	return js.tool.MapToSlice(m)
-}
-
-func (js jobService) All() model.VacancyList {
-	listMap := make(map[string]model.Vacancy)
-	var list model.VacancyList
+func (s jobService) All() entity.VacancyList {
+	listMap := make(map[string]entity.Vacancy)
+	list := entity.NewVacancyList()
 	for i := 0; ; i++ {
 		url := fmt.Sprintf("https://api.hh.ru/vacancies?text=golang&area=113&id=publication_time&page=%d", i)
 		resp, err := http.Get(url)
@@ -75,6 +72,9 @@ func (js jobService) All() model.VacancyList {
 		}
 		for _, v := range list.Items {
 			if strings.Contains(strings.ToLower(v.Name), "go") {
+				if FindAppliedVacancies(v.Id) {
+					v.Applied = '\u2705'
+				}
 				listMap[v.PublishedAt+v.Id] = v
 			}
 		}
@@ -82,18 +82,22 @@ func (js jobService) All() model.VacancyList {
 			break
 		}
 	}
-	return js.MapToSlice(listMap)
+	return s.converter.MapToSlice(listMap)
 }
 
-func (js jobService) Similar() model.VacancyList {
-	listMap := make(map[string]model.Vacancy)
-	var list model.VacancyList
+func (s jobService) Similar() entity.VacancyList {
+	listMap := make(map[string]entity.Vacancy)
+	var list entity.VacancyList
 	var link string
+	cfg, err := config.New()
+	if err != nil {
+		log.Print(err)
+	}
 	for i := 0; ; i++ {
 		buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))
-		link = fmt.Sprintf("https://api.hh.ru/resumes/e8c5ba8eff0cac22500039ed1f446166626974/similar_vacancies?area=113&id=relevance&page=%d", i)
+		link = fmt.Sprintf("https://api.hh.ru/resumes/%s/similar_vacancies?area=113&id=relevance&page=%d", cfg.ResumeID, i)
 		request, err := http.NewRequest("GET", link, buffer)
-		request.Header.Set("Authorization", "Bearer "+config.New().Bearer)
+		request.Header.Set("Authorization", "Bearer "+cfg.Bearer)
 		response, err := http.DefaultClient.Do(request)
 		if err != nil {
 			fmt.Printf("Ошибка при отправке запроса: %v\n", err)
@@ -119,5 +123,5 @@ func (js jobService) Similar() model.VacancyList {
 			break
 		}
 	}
-	return js.MapToSlice(listMap)
+	return s.converter.MapToSlice(listMap)
 }

@@ -1,10 +1,11 @@
-package model
+package entity
 
 type Employer struct {
 	Name string `json:"name"`
 }
 
 type Vacancy struct {
+	Applied      rune
 	Id           string   `json:"id"`
 	Name         string   `json:"name"`
 	PublishedAt  string   `json:"published_at"`
