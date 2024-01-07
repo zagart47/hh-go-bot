@@ -11,6 +11,6 @@ COPY .. .
 RUN env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main cmd/hh-go-bot/main.go
 
 FROM alpine:latest
-COPY internal/config/config.yaml config/
+COPY internal/config/config.yaml internal/config/
 COPY --from=builder main /main
 ENTRYPOINT ["/main"]

@@ -6,15 +6,21 @@ type Employer struct {
 
 type Vacancy struct {
 	Applied      rune
-	Id           string   `json:"id"`
-	Name         string   `json:"name"`
-	PublishedAt  string   `json:"published_at"`
-	CreatedAt    string   `json:"created_at"`
-	Archived     bool     `json:"archived"`
-	AlternateUrl string   `json:"alternate_url"`
-	Employer     Employer `json:"employer"`
+	Id           string     `json:"id"`
+	Name         string     `json:"name"`
+	PublishedAt  string     `json:"published_at"`
+	CreatedAt    string     `json:"created_at"`
+	Archived     bool       `json:"archived"`
+	AlternateUrl string     `json:"alternate_url"`
+	Relations    []string   `json:"relations"`
+	Employer     Employer   `json:"employer"`
+	Experience   Experience `json:"experience"`
 }
-type VacancyList struct {
+type Experience struct {
+	ID string `json:"id"`
+}
+
+type Vacancies struct {
 	Items        []Vacancy   `json:"items"`
 	Found        int         `json:"found"`
 	Pages        int         `json:"pages"`
@@ -27,6 +33,6 @@ type VacancyList struct {
 	AlternateUrl string      `json:"alternate_url"`
 }
 
-func NewVacancyList() VacancyList {
-	return VacancyList{}
+func NewVacancies() Vacancies {
+	return Vacancies{}
 }

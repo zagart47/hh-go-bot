@@ -1,2 +1,5 @@
-token: # your tgbot token
-bearer: # your api.hh.ru token
+bot:
+  token:
+api:
+  bearer:
+  resume_id:
