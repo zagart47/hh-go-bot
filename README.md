@@ -59,5 +59,5 @@ docker run --name hh-go-bot -dit --restart unless-stopped -d hh-go-bot
 - [ ] Добавить тесты
 
 ## Команда проекта
-- [Артур Загиров](t.me/zagart47) — Golang Developer
+- [Артур Загиров](https://t.me/zagart47) — Golang Developer
 
