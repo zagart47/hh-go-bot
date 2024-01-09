@@ -22,3 +22,9 @@ func All() (Cfg, error) {
 	}
 	return cfg, nil
 }
+
+const (
+	SimilarVacancies = "https://api.hh.ru/resumes/%s/similar_vacancies?id=publication_time&page=%d&per_page=100"
+	AllVacancies     = "https://api.hh.ru/vacancies?text=golang&id=publication_time&page=%d&per_page=100"
+	Resume           = "https://api.hh.ru/resumes/mine"
+)

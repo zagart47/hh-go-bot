@@ -19,14 +19,14 @@ func NewRequestService() RequestService {
 	return RequestService{}
 }
 
-// Request отправляет запросы с bearer токеном
-func (r RequestService) Do(ctx context.Context, link string) []byte {
+// Do отправляет запросы с bearer токеном
+func (r RequestService) Do(_ context.Context, link string, ch chan []byte) {
 	cfg, err := config.All()
 	if err != nil {
 		fmt.Println(err)
 	}
 	buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))
-	request, err := http.NewRequest("GET", link, buffer)
+	request, err := http.NewRequest(http.MethodGet, link, buffer)
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.Api.Bearer))
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
@@ -43,5 +43,5 @@ func (r RequestService) Do(ctx context.Context, link string) []byte {
 	if err != nil {
 		fmt.Println("Ошибка при чтении ответа:", err)
 	}
-	return raw
+	ch <- raw
 }

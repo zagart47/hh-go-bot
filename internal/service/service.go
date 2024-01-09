@@ -6,17 +6,16 @@ import (
 )
 
 type Vacancier interface {
-	All(context.Context, chan any)
-	Similar(context.Context, chan any)
+	Vacancy(context.Context, string, chan []string)
 	CheckRelations([]string) rune
 }
 
 type Requester interface {
-	Do(context.Context, string) []byte
+	Do(context.Context, string, chan []byte)
 }
 
 type Resumes interface {
-	MyResume(context.Context, chan any)
+	MyResume(context.Context, chan []string)
 }
 
 type Converter interface {
@@ -27,8 +26,8 @@ type Messenger interface {
 	Message(entity.Vacancies) []string
 }
 
-type Responder interface {
-	Respond(context.Context, string)
+type Context interface {
+	WithTimeout() (context.Context, context.CancelFunc)
 }
 
 type Services struct {
@@ -37,7 +36,7 @@ type Services struct {
 	Resumes   Resumes
 	Converter Converter
 	Messenger Messenger
-	Responder Responder
+	Context   Context
 }
 
 func NewServices() Services {
@@ -46,7 +45,9 @@ func NewServices() Services {
 	messageService := NewMessageService()
 	vacancyService := NewVacancyService(converterService, requestService, messageService)
 	resumeService := NewResumeService(requestService)
+	contextService := NewContextService()
 	return Services{
+		Context:   contextService,
 		Vacancier: vacancyService,
 		Requester: requestService,
 		Resumes:   resumeService,

@@ -23,7 +23,7 @@ func main() {
 	}
 	services := service.NewServices()
 	var f *string
-	f = flag.String("d", "http", "delivery using")
+	f = flag.String("d", "bot", "delivery using")
 	flag.Parse()
 
 	switch *f {

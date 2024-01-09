@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/entity"
 )
 
@@ -20,10 +21,11 @@ func NewResumeService(service RequestService) ResumeService {
 }
 
 // MyResume нужен для получения id моего резюме для поиска подходящих вакансий
-func (r ResumeService) MyResume(ctx context.Context, ch chan any) {
+func (r ResumeService) MyResume(ctx context.Context, ch chan []string) {
 	resumes := entity.NewResume()
-	link := "https://api.hh.ru/resumes/mine"
-	body := r.request.Do(ctx, link)
+	chB := make(chan []byte)
+	go r.request.Do(ctx, config.Resume, chB)
+	body := <-chB
 	err := json.Unmarshal(body, &resumes)
 	if err != nil {
 		fmt.Println("Ошибка при десериализации ответа:", err)

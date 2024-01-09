@@ -25,11 +25,9 @@ func (h Handler) Init() *gin.Engine {
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello!")
 	})
-	h.initApi(router)
-	return router
-}
-
-func (h Handler) initApi(router *gin.Engine) {
 	api := router.Group("")
-	h.initVacancyRoutes(api)
+	{
+		h.initVacancyRoutes(api)
+	}
+	return router
 }
