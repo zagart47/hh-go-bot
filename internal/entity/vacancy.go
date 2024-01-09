@@ -5,7 +5,7 @@ type Employer struct {
 }
 
 type Vacancy struct {
-	Applied      rune
+	Icon         rune
 	Id           string     `json:"id"`
 	Name         string     `json:"name"`
 	PublishedAt  string     `json:"published_at"`

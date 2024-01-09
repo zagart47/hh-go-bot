@@ -6,29 +6,29 @@ import (
 )
 
 type Vacancier interface {
-	All(context.Context, chan []string)
-	Similar(context.Context, chan []string)
-	CheckRelations(context.Context, []string) rune
+	All(context.Context, chan any)
+	Similar(context.Context, chan any)
+	CheckRelations([]string) rune
 }
 
 type Requester interface {
-	Request(context.Context, string) []byte
+	Do(context.Context, string) []byte
 }
 
 type Resumes interface {
-	MyResume(context.Context, chan []string)
+	MyResume(context.Context, chan any)
 }
 
 type Converter interface {
-	Convert(context.Context, map[string]entity.Vacancy) entity.Vacancies
+	Convert(map[string]entity.Vacancy) entity.Vacancies
 }
 
 type Messenger interface {
-	Message(context.Context, entity.Vacancies) []string
+	Message(entity.Vacancies) []string
 }
 
 type Responder interface {
-	Respond(context.Context, string) entity.Vacancies
+	Respond(context.Context, string)
 }
 
 type Services struct {
@@ -37,6 +37,7 @@ type Services struct {
 	Resumes   Resumes
 	Converter Converter
 	Messenger Messenger
+	Responder Responder
 }
 
 func NewServices() Services {

@@ -20,10 +20,10 @@ func NewResumeService(service RequestService) ResumeService {
 }
 
 // MyResume нужен для получения id моего резюме для поиска подходящих вакансий
-func (r ResumeService) MyResume(ctx context.Context, ch chan []string) {
+func (r ResumeService) MyResume(ctx context.Context, ch chan any) {
 	resumes := entity.NewResume()
 	link := "https://api.hh.ru/resumes/mine"
-	body := r.request.Request(ctx, link)
+	body := r.request.Do(ctx, link)
 	err := json.Unmarshal(body, &resumes)
 	if err != nil {
 		fmt.Println("Ошибка при десериализации ответа:", err)

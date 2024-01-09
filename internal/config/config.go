@@ -6,6 +6,9 @@ type Cfg struct {
 	Bot struct {
 		Token string `yaml:"token"`
 	} `yaml:"bot"`
+	HTTP struct {
+		Host string `yaml:"host"`
+	} `yaml:"http"`
 	Api struct {
 		Bearer   string `yaml:"bearer"`
 		ResumeID string `yaml:"resume_id"`

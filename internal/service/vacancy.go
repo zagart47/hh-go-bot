@@ -31,20 +31,20 @@ const GotInvitation = "got_invitation"
 const GotRejection = "got_rejection"
 
 // All ищет все вакансии согласно строке поиска
-func (s VacancyService) All(ctx context.Context, ch chan []string) {
+func (s VacancyService) All(ctx context.Context, ch chan any) {
 	listMap := make(map[string]entity.Vacancy)
 	vacancies := entity.NewVacancies()
 	var link string
 	for i := 0; ; i++ {
 		link = fmt.Sprintf("https://api.hh.ru/vacancies?text=golang&id=publication_time&page=%d&per_page=100", i)
-		body := s.requester.Request(ctx, link)
+		body := s.requester.Do(ctx, link)
 		err := json.Unmarshal(body, &vacancies)
 		if err != nil {
 			fmt.Println("Ошибка при десериализации ответа:", err)
 		}
 		for _, vacancy := range vacancies.Items {
 			if strings.Contains(strings.ToLower(vacancy.Name), "go") {
-				vacancy.Applied = s.vacancier.CheckRelations(ctx, vacancy.Relations)
+				vacancy.Icon = s.vacancier.CheckRelations(vacancy.Relations)
 				listMap[fmt.Sprintf("%s%s", vacancy.PublishedAt, vacancy.Id)] = vacancy
 			}
 		}
@@ -52,12 +52,11 @@ func (s VacancyService) All(ctx context.Context, ch chan []string) {
 			break
 		}
 	}
-	raw := s.converter.Convert(ctx, listMap)
-	ch <- s.messenger.Message(ctx, raw)
+	ch <- s.converter.Convert(listMap)
 }
 
 // Similar нужен для поиска подходящих к резюме вакансий
-func (s VacancyService) Similar(ctx context.Context, ch chan []string) {
+func (s VacancyService) Similar(ctx context.Context, ch chan any) {
 	listMap := make(map[string]entity.Vacancy)
 	vacancies := entity.NewVacancies()
 	cfg, err := config.All()
@@ -66,28 +65,26 @@ func (s VacancyService) Similar(ctx context.Context, ch chan []string) {
 	}
 	for i := 0; ; i++ {
 		link := fmt.Sprintf("https://api.hh.ru/resumes/%s/similar_vacancies?id=publication_time&page=%d&per_page=100", cfg.Api.ResumeID, i)
-		body := s.requester.Request(ctx, link)
+		body := s.requester.Do(ctx, link)
 		err = json.Unmarshal(body, &vacancies)
 		if err != nil {
 			fmt.Println("Ошибка при десериализации ответа:", err)
 		}
 		for _, vacancy := range vacancies.Items {
 			if strings.Contains(strings.ToLower(vacancy.Name), "go") {
-				vacancy.Applied = s.vacancier.CheckRelations(ctx, vacancy.Relations)
+				vacancy.Icon = s.vacancier.CheckRelations(vacancy.Relations)
 				listMap[fmt.Sprintf("%s%s", vacancy.PublishedAt, vacancy.Id)] = vacancy
-
 			}
 		}
 		if vacancies.Pages == i {
 			break
 		}
 	}
-	raw := s.converter.Convert(ctx, listMap)
-	ch <- s.messenger.Message(ctx, raw)
+	ch <- s.converter.Convert(listMap)
 }
 
 // CheckRelations нужен для проверки откликов на вакансии и установки эмодзи рядом с заголовком вакансии
-func (s VacancyService) CheckRelations(ctx context.Context, ss []string) (r rune) {
+func (s VacancyService) CheckRelations(ss []string) (r rune) {
 	for _, v := range ss {
 		switch v {
 		case GotResponse:
