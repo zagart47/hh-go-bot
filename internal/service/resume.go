@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
 )
 
@@ -24,7 +24,7 @@ func NewResumeService(service RequestService) ResumeService {
 func (r ResumeService) MyResume(ctx context.Context, ch chan []string) {
 	resumes := entity.NewResume()
 	chB := make(chan []byte)
-	go r.request.Do(ctx, config.Resume, chB)
+	go r.request.Do(ctx, consts.Resume, chB)
 	body := <-chB
 	err := json.Unmarshal(body, &resumes)
 	if err != nil {

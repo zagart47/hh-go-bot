@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"hh-go-bot/internal/service"
-	"net/http"
 )
 
 type Handler struct {
@@ -22,12 +21,11 @@ func (h Handler) Init() *gin.Engine {
 		gin.Recovery(),
 		gin.Logger(),
 	)
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "hello!")
-	})
-	api := router.Group("")
+	api := router.Group("/")
 	{
-		h.initVacancyRoutes(api)
+		h.initAllVacancy(api)
+		h.initSimilarVacancyRoutes(api)
+		h.initResumeRoutes(api)
 	}
 	return router
 }

@@ -17,7 +17,8 @@ type Vacancy struct {
 	Experience   Experience `json:"experience"`
 }
 type Experience struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type Vacancies struct {

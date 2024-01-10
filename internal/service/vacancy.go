@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
 	"log"
 	"strings"
@@ -25,12 +26,6 @@ func NewVacancyService(converter Converter, requestService RequestService, messe
 		messenger: messenger,
 	}
 }
-
-const (
-	GotResponse   = "got_response"
-	GotInvitation = "got_invitation"
-	GotRejection  = "got_rejection"
-)
 
 func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan []string) {
 	listMap := make(map[string]entity.Vacancy)
@@ -56,7 +51,7 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan []strin
 		for _, vacancy := range vacancies.Items {
 			if strings.Contains(strings.ToLower(vacancy.Name), "go") {
 				vacancy.Icon = vs.vacancier.CheckRelations(vacancy.Relations)
-				listMap[fmt.Sprintf("%vs%vs", vacancy.PublishedAt, vacancy.Id)] = vacancy
+				listMap[fmt.Sprintf("%s%s", vacancy.PublishedAt, vacancy.Id)] = vacancy
 			}
 		}
 		if vacancies.Pages == i {
@@ -64,17 +59,17 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan []strin
 		}
 	}
 	vacanciesSlice := vs.converter.Convert(listMap)
-	chV <- vs.messenger.Message(vacanciesSlice)
+	chV <- vs.messenger.MakeMessage(vacanciesSlice)
 }
 
 func (vs VacancyService) CheckRelations(ss []string) (r rune) {
 	for _, v := range ss {
 		switch v {
-		case GotResponse:
+		case consts.GotResponse:
 			r = '\u26a0'
-		case GotInvitation:
+		case consts.GotInvitation:
 			r = '\u2705'
-		case GotRejection:
+		case consts.GotRejection:
 			r = '\u274c'
 		default:
 			r = 0

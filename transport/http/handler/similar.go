@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-func (h Handler) initAllVacancy(api *gin.RouterGroup) {
+func (h Handler) initSimilarVacancyRoutes(api *gin.RouterGroup) {
 	vacancy := api.Group("/vacancy")
-	vacancy.GET("/all", h.Vacancy)
+	vacancy.GET("/similar", h.Similar)
 }
 
-func (h Handler) Vacancy(c *gin.Context) {
+func (h Handler) Similar(c *gin.Context) {
 	ch := make(chan []string)
 	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout*time.Second)
 	defer cancel()
-	go h.services.Vacancier.Vacancy(ctx, consts.AllVacancies, ch)
+	go h.services.Vacancier.Vacancy(ctx, consts.SimilarVacancies, ch)
 
 	select {
 	case <-ctx.Done():
