@@ -40,7 +40,7 @@ func (b BotService) GetUpdatesChan(config tgbotapi.UpdateConfig) tgbotapi.Update
 func (b BotService) Echo() error {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 15
-	updates := b.bot.GetUpdatesChan(u)
+	updates := b.GetUpdatesChan(u)
 	for update := range updates {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*consts.Timeout)
 		defer cancel()
@@ -69,14 +69,14 @@ func (b BotService) Echo() error {
 		select {
 		case <-ctx.Done():
 			msg.Text = "20 sec timeout"
-			_, err := b.bot.Send(msg)
+			_, err := b.Send(msg)
 			if err != nil {
 				return err
 			}
 		case raw := <-ch:
 			for _, v := range raw {
 				msg.Text = v
-				_, err := b.bot.Send(msg)
+				_, err := b.Send(msg)
 				if err != nil {
 					return err
 				}
