@@ -21,10 +21,10 @@ func NewResumeService(service RequestService) ResumeService {
 }
 
 // MyResume нужен для получения id моего резюме для поиска подходящих вакансий
-func (r ResumeService) MyResume(ctx context.Context, ch chan []string) {
+func (r ResumeService) MyResume(ctx context.Context, ch chan any) {
 	resumes := entity.NewResume()
 	chB := make(chan []byte)
-	go r.request.Do(ctx, consts.Resume, chB)
+	go r.request.doRequest(ctx, consts.Resume, chB)
 	body := <-chB
 	err := json.Unmarshal(body, &resumes)
 	if err != nil {

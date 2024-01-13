@@ -6,7 +6,6 @@ import (
 	"hh-go-bot/internal/consts"
 	"log"
 	"net/http"
-	"time"
 )
 
 func (h Handler) initResumeRoutes(api *gin.RouterGroup) {
@@ -15,8 +14,8 @@ func (h Handler) initResumeRoutes(api *gin.RouterGroup) {
 }
 
 func (h Handler) Resume(c *gin.Context) {
-	ch := make(chan []string)
-	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout*time.Second)
+	ch := make(chan any)
+	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 	defer cancel()
 	go h.services.Resumes.MyResume(ctx, ch)
 
@@ -24,6 +23,6 @@ func (h Handler) Resume(c *gin.Context) {
 	case <-ctx.Done():
 		log.Fatal("timeout")
 	case resumes := <-ch:
-		c.JSON(http.StatusOK, resumes)
+		c.JSON(http.StatusOK, resumes.([]string))
 	}
 }

@@ -23,8 +23,8 @@ func (h Handler) Init() *gin.Engine {
 	)
 	api := router.Group("/")
 	{
-		h.initAllVacancy(api)
-		h.initSimilarVacancyRoutes(api)
+		h.initAllVacanciesRoutes(api)
+		h.initSimilarVacanciesRoutes(api)
 		h.initResumeRoutes(api)
 	}
 	return router

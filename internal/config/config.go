@@ -1,9 +1,14 @@
 package config
 
-import "github.com/ilyakaznacheev/cleanenv"
+import (
+	"github.com/ilyakaznacheev/cleanenv"
+	"log"
+	"os"
+)
 
 type Cfg struct {
-	Bot struct {
+	Mode string
+	Bot  struct {
 		Token string `yaml:"token"`
 	} `yaml:"bot"`
 	HTTP struct {
@@ -15,10 +20,17 @@ type Cfg struct {
 	} `yaml:"api"`
 }
 
-func All() (Cfg, error) {
+func NewConfig() Cfg {
 	cfg := Cfg{}
 	if err := cleanenv.ReadConfig("./internal/config/config.yaml", &cfg); err != nil {
-		return Cfg{}, err
+		log.Println("cannot read configs")
+		os.Exit(1)
 	}
-	return cfg, nil
+	return cfg
+}
+
+var All = NewConfig()
+
+func (c *Cfg) SetMode(m string) {
+	c.Mode = m
 }

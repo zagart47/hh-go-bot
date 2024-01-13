@@ -6,6 +6,12 @@ import (
 	"sort"
 )
 
+const (
+	between1and3 = "between1And3"
+	between3and6 = "between3And6"
+	moreThan6    = "moreThan6"
+)
+
 type ConverterService struct {
 	converter Converter
 }
@@ -14,7 +20,7 @@ func NewConverterService() ConverterService {
 	return ConverterService{}
 }
 
-func (c ConverterService) Convert(m map[string]entity.Vacancy) entity.Vacancies {
+func (c ConverterService) convert(m map[string]entity.Vacancy) entity.Vacancies {
 	vacancies := entity.NewVacancies()
 	keys := make([]string, 0, len(m))
 	for k, _ := range m {
@@ -28,19 +34,19 @@ func (c ConverterService) Convert(m map[string]entity.Vacancy) entity.Vacancies 
 		}
 	}
 	for _, k := range keys {
-		if m[k].Experience.ID == consts.Between1and3 {
+		if m[k].Experience.ID == between1and3 {
 			vacancies.Items = append(vacancies.Items, m[k])
 			delete(m, k)
 		}
 	}
 	for _, k := range keys {
-		if m[k].Experience.ID == consts.Between3and6 {
+		if m[k].Experience.ID == between3and6 {
 			vacancies.Items = append(vacancies.Items, m[k])
 			delete(m, k)
 		}
 	}
 	for _, k := range keys {
-		if m[k].Experience.ID == consts.MoreThan6 {
+		if m[k].Experience.ID == moreThan6 {
 			vacancies.Items = append(vacancies.Items, m[k])
 			delete(m, k)
 		}

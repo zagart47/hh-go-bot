@@ -6,6 +6,11 @@ import (
 	"hh-go-bot/internal/entity"
 )
 
+const (
+	requireExp   = "Требуемый опыт"
+	continuePage = "(продолжение)"
+)
+
 type MessageService struct {
 	messenger Messenger
 }
@@ -16,19 +21,19 @@ func NewMessageService() MessageService {
 
 // MakeMessage делит список вакансий на массив по 40 вакансий в каждом элементе,
 // чтобы уложиться в лимит символов (4096) в сообщении
-func (s MessageService) MakeMessage(vacancies entity.Vacancies) []string {
+func (s MessageService) makeMessage(vacancies entity.Vacancies) []string {
 	var previousExp, message string
 	var messages []string
 	var vacancyCount int
 	for _, v := range vacancies.Items {
 		if previousExp == "" {
-			message = fmt.Sprintf("%s\n%s: %s\n", message, consts.RequireExp, v.Experience.Name)
+			message = fmt.Sprintf("%s\n%s: %s\n", message, requireExp, v.Experience.Name)
 			previousExp = consts.NoExperience
 		}
 		if previousExp != v.Experience.ID {
 			messages = append(messages, message)
 			vacancyCount = 0
-			message = fmt.Sprintf("\n%s: %s\n", consts.RequireExp, v.Experience.Name)
+			message = fmt.Sprintf("\n%s: %s\n", requireExp, v.Experience.Name)
 			previousExp = v.Experience.ID
 		}
 		if v.Icon == 0 {
@@ -40,7 +45,7 @@ func (s MessageService) MakeMessage(vacancies entity.Vacancies) []string {
 		if vacancyCount == 40 {
 			messages = append(messages, message)
 			vacancyCount = 0
-			message = fmt.Sprintf("%s: %s (продолжение)\n", consts.RequireExp, v.Experience.Name)
+			message = fmt.Sprintf("%s: %s %s\n", continuePage, requireExp, v.Experience.Name)
 		}
 	}
 	if message != "" {

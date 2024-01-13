@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"hh-go-bot/internal/config"
 	"io"
-	"log"
 	"net/http"
-	"os"
 )
 
 type RequestService struct {
@@ -20,28 +18,25 @@ func NewRequestService() RequestService {
 }
 
 // Do отправляет запросы с bearer токеном
-func (r RequestService) Do(_ context.Context, link string, ch chan []byte) {
-	cfg, err := config.All()
+func (r RequestService) doRequest(_ context.Context, link string, ch chan []byte) {
+
+	buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))
+	request, err := http.NewRequest(http.MethodGet, link, buffer)
 	if err != nil {
 		fmt.Println(err)
 	}
-	buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))
-	request, err := http.NewRequest(http.MethodGet, link, buffer)
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.Api.Bearer))
+
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.All.Api.Bearer))
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		fmt.Printf("Ошибка при отправке запроса: %v\n", err)
-		os.Exit(1)
 	}
+
 	raw, err := io.ReadAll(response.Body)
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(response.Body)
 	if err != nil {
 		fmt.Println("Ошибка при чтении ответа:", err)
 	}
+
+	defer response.Body.Close()
 	ch <- raw
 }

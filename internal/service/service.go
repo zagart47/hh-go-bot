@@ -6,24 +6,24 @@ import (
 )
 
 type Vacancier interface {
-	Vacancy(context.Context, string, chan []string)
-	CheckRelations([]string) rune
+	Vacancy(context.Context, string, chan any)
+	checkRelations([]string) rune
 }
 
 type Requester interface {
-	Do(context.Context, string, chan []byte)
+	doRequest(context.Context, string, chan []byte)
 }
 
 type Resumes interface {
-	MyResume(context.Context, chan []string)
+	MyResume(context.Context, chan any)
 }
 
 type Messenger interface {
-	MakeMessage(entity.Vacancies) []string
+	makeMessage(entity.Vacancies) []string
 }
 
 type Converter interface {
-	Convert(map[string]entity.Vacancy) entity.Vacancies
+	convert(map[string]entity.Vacancy) entity.Vacancies
 }
 type Services struct {
 	Vacancier Vacancier

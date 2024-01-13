@@ -5,7 +5,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/service"
-	"time"
 )
 
 type BotAPI interface {
@@ -42,7 +41,7 @@ func (b BotService) Echo() error {
 	u.Timeout = 15
 	updates := b.GetUpdatesChan(u)
 	for update := range updates {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*consts.Timeout)
+		ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 		defer cancel()
 		if update.Message == nil {
 			continue
@@ -50,7 +49,7 @@ func (b BotService) Echo() error {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.DisableWebPagePreview = true
 
-		ch := make(chan []string)
+		ch := make(chan any)
 		switch update.Message.Command() {
 
 		case "similar":
@@ -74,7 +73,8 @@ func (b BotService) Echo() error {
 				return err
 			}
 		case raw := <-ch:
-			for _, v := range raw {
+			text := raw.([]string)
+			for _, v := range text {
 				msg.Text = v
 				_, err := b.Send(msg)
 				if err != nil {
