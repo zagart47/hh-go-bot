@@ -6,6 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
+	"hh-go-bot/internal/repository/postgresql"
 	"hh-go-bot/internal/service"
 	"hh-go-bot/transport/http"
 	"hh-go-bot/transport/http/handler"
@@ -14,14 +15,18 @@ import (
 )
 
 func main() {
-	services := service.NewServices()
+	db, err := postgresql.New()
+	repos := postgresql.NewRepositories(db)
+	services := service.NewServices(repos)
+	if err != nil {
+		log.Printf("db pool create error %s", err)
+	}
 	var f *string
-	f = flag.String("d", "bot", "delivery using")
+	f = flag.String("d", "http", "delivery using")
 	flag.Parse()
 
 	switch *f {
 	case consts.BOT:
-		config.All.SetMode(consts.BOT)
 		bot, err := tgbotapi.NewBotAPI(config.All.Bot.Token)
 		if err != nil {
 			log.Fatal(err)
@@ -34,7 +39,6 @@ func main() {
 			log.Fatal(err)
 		}
 	case consts.HTTP:
-		config.All.SetMode(consts.HTTP)
 		handlers := handler.NewHandler(&services)
 		srv := http.NewServer(config.All.HTTP.Host, handlers.Init())
 		err := srv.Run()

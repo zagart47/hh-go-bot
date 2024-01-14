@@ -22,16 +22,9 @@ type Experience struct {
 }
 
 type Vacancies struct {
-	Items        []Vacancy   `json:"items"`
-	Found        int         `json:"found"`
-	Pages        int         `json:"pages"`
-	Page         int         `json:"page"`
-	PerPage      int         `json:"per_page"`
-	Clusters     interface{} `json:"clusters"`
-	Arguments    interface{} `json:"arguments"`
-	Fixes        interface{} `json:"fixes"`
-	Suggests     interface{} `json:"suggests"`
-	AlternateUrl string      `json:"alternate_url"`
+	Items        []Vacancy `json:"items"`
+	Pages        int       `json:"pages"`
+	AlternateUrl string    `json:"alternate_url"`
 }
 
 func NewVacancies() Vacancies {

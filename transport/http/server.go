@@ -2,6 +2,8 @@ package http
 
 import (
 	"context"
+	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/consts"
 	"net/http"
 )
 
@@ -19,6 +21,7 @@ func NewServer(host string, handler http.Handler) *Server {
 }
 
 func (s *Server) Run() error {
+	config.All.SetMode(consts.HTTP)
 	return s.httpServer.ListenAndServe()
 }
 

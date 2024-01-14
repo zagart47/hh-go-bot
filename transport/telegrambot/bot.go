@@ -3,6 +3,7 @@ package telegrambot
 import (
 	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/service"
 )
@@ -37,6 +38,7 @@ func (b BotService) GetUpdatesChan(config tgbotapi.UpdateConfig) tgbotapi.Update
 }
 
 func (b BotService) Echo() error {
+	config.All.SetMode(consts.BOT)
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 15
 	updates := b.GetUpdatesChan(u)

@@ -7,6 +7,8 @@ import (
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
+	"hh-go-bot/internal/repository/postgresql"
+	"log"
 	"strings"
 )
 
@@ -21,18 +23,20 @@ const (
 )
 
 type VacancyService struct {
-	vacancier Vacancier
-	converter Converter
-	requester Requester
-	messenger Messenger
+	vacancier     Vacancier
+	converter     Converter
+	requester     Requester
+	messenger     Messenger
+	vacanciesRepo postgresql.Repositories
 }
 
-func NewVacancyService(converter Converter, requestService RequestService, messenger Messenger) VacancyService {
+func NewVacancyService(converter Converter, requestService RequestService, messenger Messenger, vacanciesRepo *postgresql.Repositories) VacancyService {
 	return VacancyService{
-		vacancier: VacancyService{},
-		converter: converter,
-		requester: requestService,
-		messenger: messenger,
+		vacancier:     VacancyService{},
+		converter:     converter,
+		requester:     requestService,
+		messenger:     messenger,
+		vacanciesRepo: *vacanciesRepo,
 	}
 }
 
@@ -63,7 +67,12 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan any) {
 			break
 		}
 	}
+
 	vacanciesSlice := vs.converter.convert(listMap)
+	err := vs.vacanciesRepo.Vacancies.Create(ctx, vacanciesSlice)
+	if err != nil {
+		log.Println(err)
+	}
 	if config.All.Mode == consts.BOT {
 		chV <- vs.messenger.makeMessage(vacanciesSlice)
 	}

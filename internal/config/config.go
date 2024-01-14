@@ -18,6 +18,13 @@ type Cfg struct {
 		Bearer   string `yaml:"bearer"`
 		ResumeID string `yaml:"resume_id"`
 	} `yaml:"api"`
+	PostgreSQL struct {
+		Host     string `yaml:"host" default:"localhost"`
+		Port     string `yaml:"port" default:"5432"`
+		DBName   string `yaml:"db_name" default:"postgres"`
+		UserName string `yaml:"user_name" default:"postgres"`
+		Pwd      string `yaml:"pwd" default:"postgres"`
+	} `yaml:"postgreSQL"`
 }
 
 func NewConfig() Cfg {
