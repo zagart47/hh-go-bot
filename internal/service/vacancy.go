@@ -7,7 +7,7 @@ import (
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
-	"hh-go-bot/internal/repository/postgresql"
+	"hh-go-bot/internal/repository"
 	"log"
 	"strings"
 )
@@ -27,16 +27,16 @@ type VacancyService struct {
 	converter     Converter
 	requester     Requester
 	messenger     Messenger
-	vacanciesRepo postgresql.Repositories
+	vacanciesRepo repository.Repositories
 }
 
-func NewVacancyService(converter Converter, requestService RequestService, messenger Messenger, vacanciesRepo *postgresql.Repositories) VacancyService {
+func NewVacancyService(converter Converter, requestService RequestService, messenger Messenger, vacanciesRepo repository.Repositories) VacancyService {
 	return VacancyService{
 		vacancier:     VacancyService{},
 		converter:     converter,
 		requester:     requestService,
 		messenger:     messenger,
-		vacanciesRepo: *vacanciesRepo,
+		vacanciesRepo: vacanciesRepo,
 	}
 }
 

@@ -27,6 +27,6 @@ type Vacancies struct {
 	AlternateUrl string    `json:"alternate_url"`
 }
 
-func NewVacancies() Vacancies {
-	return Vacancies{}
+func NewVacancies() *Vacancies {
+	return &Vacancies{}
 }

@@ -43,6 +43,7 @@ func (b BotService) Echo() error {
 	u.Timeout = 15
 	updates := b.GetUpdatesChan(u)
 	for update := range updates {
+
 		ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 		defer cancel()
 		if update.Message == nil {

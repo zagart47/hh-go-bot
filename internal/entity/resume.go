@@ -8,8 +8,8 @@ type Resume struct {
 	PerPage int64  `json:"per_page"`
 }
 
-func NewResume() Resume {
-	return Resume{}
+func NewResume() *Resume {
+	return &Resume{}
 }
 
 type Item struct {

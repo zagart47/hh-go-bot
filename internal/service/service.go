@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"hh-go-bot/internal/entity"
-	"hh-go-bot/internal/repository/postgresql"
+	"hh-go-bot/internal/repository"
 )
 
 type Vacancier interface {
@@ -26,27 +26,35 @@ type Messenger interface {
 type Converter interface {
 	convert(map[string]entity.Vacancy) entity.Vacancies
 }
+
+type UserManager interface {
+	Name() string
+	ID() int64
+}
 type Services struct {
 	Vacancier     Vacancier
 	Requester     Requester
 	Resumes       Resumes
 	Converter     Converter
 	Messenger     Messenger
-	VacanciesRepo postgresql.Repositories
+	VacanciesRepo repository.Repositories
+	UserManager   UserManager
 }
 
-func NewServices(VacanciesRepo *postgresql.Repositories) Services {
+func NewServices(VacanciesRepo repository.Repositories) Services {
 	converterService := NewConverterService()
 	requestService := NewRequestService()
 	messageService := NewMessageService()
 	vacancyService := NewVacancyService(converterService, requestService, messageService, VacanciesRepo)
 	resumeService := NewResumeService(requestService)
+	userService := NewUserService()
 	return Services{
 		Vacancier:     vacancyService,
 		Requester:     requestService,
 		Resumes:       resumeService,
 		Converter:     converterService,
 		Messenger:     messageService,
-		VacanciesRepo: *VacanciesRepo,
+		VacanciesRepo: VacanciesRepo,
+		UserManager:   userService,
 	}
 }
