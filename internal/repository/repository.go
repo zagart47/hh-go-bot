@@ -24,6 +24,6 @@ type Repositories struct {
 func NewRepositories(db *pgxpool.Pool, redis *cache.RedisService) Repositories {
 	return Repositories{
 		vacancies: postgresql.NewVacancyRepository(db),
-		redis:     redis,
+		redis:     *redis,
 	}
 }
