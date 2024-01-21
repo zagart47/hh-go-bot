@@ -8,12 +8,12 @@ import (
 )
 
 type Server struct {
-	httpServer *http.Server
+	httpServer http.Server
 }
 
-func NewServer(host string, handler http.Handler) *Server {
-	return &Server{
-		httpServer: &http.Server{
+func NewServer(host string, handler http.Handler) Server {
+	return Server{
+		httpServer: http.Server{
 			Addr:    host,
 			Handler: handler,
 		},

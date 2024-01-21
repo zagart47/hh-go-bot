@@ -19,7 +19,7 @@ func (h Handler) AllVacancies(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 	defer cancel()
-	go h.services.Vacancier.Vacancy(ctx, consts.AllVacancies, ch)
+	go h.services.Vacancier.Vacancy(ctx, consts.AllVacanciesLink, ch)
 
 	select {
 	case <-ctx.Done():

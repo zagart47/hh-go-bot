@@ -24,7 +24,7 @@ func NewResumeService(service RequestService) ResumeService {
 func (r ResumeService) MyResume(ctx context.Context, ch chan any) {
 	resumes := entity.NewResume()
 	chB := make(chan []byte)
-	go r.request.doRequest(ctx, consts.Resume, chB)
+	go r.request.doRequest(ctx, consts.ResumeLink, chB)
 	body := <-chB
 	err := json.Unmarshal(body, &resumes)
 	if err != nil {

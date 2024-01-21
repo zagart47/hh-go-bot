@@ -4,7 +4,6 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
-	"time"
 )
 
 type Cfg struct {
@@ -27,10 +26,12 @@ type Cfg struct {
 		Pwd      string `yaml:"pwd" default:"postgres"`
 	} `yaml:"postgreSQL"`
 	Redis struct {
-		Host    string        `yaml:"host"`
-		Pwd     string        `yaml:"pwd"`
-		Timeout time.Duration `yaml:"timeout"`
+		Host    string `yaml:"host"`
+		Port    string `yaml:"port"`
+		Pwd     string `yaml:"pwd"`
+		Timeout int    `yaml:"timeout"`
 	} `yaml:"redis"`
+	LoggerMode string `yaml:"logger_mode"`
 }
 
 func NewConfig() Cfg {

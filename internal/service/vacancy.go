@@ -55,7 +55,7 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan any) {
 		body := <-ch
 		err := json.Unmarshal(body, &vacancies)
 		if err != nil {
-			fmt.Println("Ошибка при десериализации ответа:", err)
+			log.Println("unmarshalling error")
 		}
 		for _, vacancy := range vacancies.Items {
 			if strings.Contains(strings.ToLower(vacancy.Name), "go") {
@@ -67,8 +67,8 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan any) {
 			break
 		}
 	}
-
 	vacanciesSlice := vs.converter.convert(listMap)
+	go vs.vacanciesRepo.Redis.ConvertAndSet(ctx, vacanciesSlice)
 	err := vs.vacanciesRepo.Vacancies.Create(ctx, vacanciesSlice)
 	if err != nil {
 		log.Println(err)

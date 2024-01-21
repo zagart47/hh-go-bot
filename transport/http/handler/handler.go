@@ -6,21 +6,18 @@ import (
 )
 
 type Handler struct {
-	services *service.Services
+	services service.Services
 }
 
-func NewHandler(services *service.Services) *Handler {
-	return &Handler{
+func NewHandler(services service.Services) Handler {
+	return Handler{
 		services: services,
 	}
 }
 
 func (h Handler) Init() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	router.Use(
-		gin.Recovery(),
-		gin.Logger(),
-	)
 	api := router.Group("/")
 	{
 		h.initAllVacanciesRoutes(api)

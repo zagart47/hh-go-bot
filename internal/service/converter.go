@@ -23,7 +23,7 @@ func NewConverterService() ConverterService {
 func (c ConverterService) convert(m map[string]entity.Vacancy) entity.Vacancies {
 	vacancies := entity.NewVacancies()
 	keys := make([]string, 0, len(m))
-	for k, _ := range m {
+	for k := range m {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys) // sort vacancies by publication date+id

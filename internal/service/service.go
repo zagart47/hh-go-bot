@@ -27,7 +27,7 @@ type Converter interface {
 	convert(map[string]entity.Vacancy) entity.Vacancies
 }
 
-type UserManager interface {
+type User interface {
 	Name() string
 	ID() int64
 }
@@ -38,7 +38,7 @@ type Services struct {
 	Converter     Converter
 	Messenger     Messenger
 	VacanciesRepo repository.Repositories
-	UserManager   UserManager
+	User          User
 }
 
 func NewServices(VacanciesRepo repository.Repositories) Services {
@@ -55,6 +55,6 @@ func NewServices(VacanciesRepo repository.Repositories) Services {
 		Converter:     converterService,
 		Messenger:     messageService,
 		VacanciesRepo: VacanciesRepo,
-		UserManager:   userService,
+		User:          userService,
 	}
 }

@@ -18,7 +18,7 @@ func (h Handler) SimilarVacancies(c *gin.Context) {
 	ch := make(chan any)
 	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 	defer cancel()
-	go h.services.Vacancier.Vacancy(ctx, consts.SimilarVacancies, ch)
+	go h.services.Vacancier.Vacancy(ctx, consts.SimilarVacanciesLink, ch)
 
 	select {
 	case <-ctx.Done():

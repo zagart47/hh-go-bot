@@ -56,10 +56,10 @@ func (b BotService) Echo() error {
 		switch update.Message.Command() {
 
 		case "similar":
-			go b.services.Vacancier.Vacancy(ctx, consts.SimilarVacancies, ch)
+			go b.services.Vacancier.Vacancy(ctx, consts.SimilarVacanciesLink, ch)
 
 		case "jobs":
-			go b.services.Vacancier.Vacancy(ctx, consts.AllVacancies, ch)
+			go b.services.Vacancier.Vacancy(ctx, consts.AllVacanciesLink, ch)
 
 		case "resume":
 			go b.services.Resumes.MyResume(ctx, ch)

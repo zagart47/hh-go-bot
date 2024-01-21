@@ -1,4 +1,4 @@
-FROM golang:latest-bullseye as builder
+FROM golang:1.21.6-bullseye as builder
 RUN apt-get update && apt-get install -y ca-certificates openssl
 ARG cert_location=/usr/local/share/ca-certificates
 RUN openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > ${cert_location}/github.crt

@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/go-redis/redis/v8"
 	"hh-go-bot/internal/config"
+	"hh-go-bot/internal/entity"
+	"log"
 	"time"
 )
 
@@ -16,14 +18,21 @@ func NewRedisClient(addr string, pwd string) *redis.Client {
 }
 
 type RedisService struct {
-	client *redis.Client
+	redis redis.Client
 }
 
-func NewRedisService(client *redis.Client) *RedisService {
-	return &RedisService{client: client}
+func NewRedisService(client *redis.Client) RedisService {
+	return RedisService{
+		redis: *client,
+	}
 }
 
-func (s RedisService) ConvertAndSet(ctx context.Context, key string, value any) {
-	timeout := config.All.Redis.Timeout * time.Hour
-	s.client.Set(ctx, key, value, timeout)
+func (s RedisService) ConvertAndSet(ctx context.Context, value any) {
+	vacancies, ok := value.(entity.Vacancies)
+	if !ok {
+		log.Println("type error")
+	}
+	for _, v := range vacancies.Items {
+		s.redis.Set(ctx, v.Id, v, time.Duration(config.All.Redis.Timeout)*time.Hour)
+	}
 }

@@ -17,13 +17,13 @@ type Vacancies interface {
 }
 
 type Repositories struct {
-	vacancies Vacancies
-	redis     cache.RedisService
+	Vacancies Vacancies
+	Redis     cache.RedisService
 }
 
-func NewRepositories(db *pgxpool.Pool, redis *cache.RedisService) Repositories {
+func NewRepositories(db *pgxpool.Pool, redis cache.RedisService) Repositories {
 	return Repositories{
-		vacancies: postgresql.NewVacancyRepository(db),
-		redis:     *redis,
+		Vacancies: postgresql.NewVacancyRepository(db),
+		Redis:     redis,
 	}
 }

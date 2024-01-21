@@ -1,3 +1,4 @@
+logger_mode:
 bot:
   token:
 
@@ -8,3 +9,16 @@ api:
   bearer:
   refresh_token:
   resume_id:
+
+postgreSQL:
+  host:
+  port:
+  db_name:
+  user_name:
+  pwd:
+
+redis:
+  host:
+  port:
+  pwd:
+  timeout:
