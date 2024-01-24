@@ -11,7 +11,7 @@ const (
 	envRelease = "release"
 )
 
-func NewLogger() *slog.Logger {
+func newLogger() *slog.Logger {
 	env := config.All.LoggerMode
 	var log *slog.Logger
 
@@ -32,28 +32,4 @@ func NewLogger() *slog.Logger {
 	return log
 }
 
-var MyLogger = NewLogger()
-
-type Logger interface {
-	Debug(string, ...any)
-	Info(string, ...any)
-	Error(string, ...any)
-	Warn(string, ...any)
-}
-
-type Log struct {
-	logger *slog.Logger
-}
-
-func (l Log) Debug(msg string, args ...any) {
-	l.logger.Debug(msg, args)
-}
-func (l Log) Info(msg string, args ...any) {
-	l.logger.Info(msg, args)
-}
-func (l Log) Error(msg string, args ...any) {
-	l.logger.Error(msg, args)
-}
-func (l Log) Warn(msg string, args ...any) {
-	l.logger.Warn(msg, args)
-}
+var Log = newLogger()

@@ -27,7 +27,6 @@ type Cfg struct {
 	} `yaml:"postgreSQL"`
 	Redis struct {
 		Host    string `yaml:"host"`
-		Port    string `yaml:"port"`
 		Pwd     string `yaml:"pwd"`
 		Timeout int    `yaml:"timeout"`
 	} `yaml:"redis"`

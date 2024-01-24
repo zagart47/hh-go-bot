@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5/pgconn"
 	"hh-go-bot/internal/entity"
+	"hh-go-bot/pkg/logger"
 )
 
 type VacancyRepo struct {
@@ -25,6 +26,7 @@ func (r VacancyRepo) Create(ctx context.Context, vacancies entity.Vacancies) err
 				fmt.Printf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where)
 			}
 		}
+		logger.Log.Debug("vacancy added to db", "id", v.Id)
 	}
 	return nil
 }

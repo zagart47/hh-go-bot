@@ -8,6 +8,7 @@ import (
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
 	"hh-go-bot/internal/repository"
+	"hh-go-bot/pkg/logger"
 	"log"
 	"strings"
 )
@@ -44,35 +45,55 @@ func (vs VacancyService) Vacancy(ctx context.Context, s string, chV chan any) {
 	listMap := make(map[string]entity.Vacancy)
 	vacancies := entity.NewVacancies()
 	var link string
-	for i := 0; ; i++ {
-		if strings.Contains(s, "similar_vacancies") {
-			link = fmt.Sprintf(s, config.All.Api.ResumeID, i)
-		} else {
-			link = fmt.Sprintf(s, i)
-		}
-		ch := make(chan []byte)
-		go vs.requester.doRequest(ctx, link, ch)
-		body := <-ch
-		err := json.Unmarshal(body, &vacancies)
-		if err != nil {
-			log.Println("unmarshalling error")
-		}
-		for _, vacancy := range vacancies.Items {
-			if strings.Contains(strings.ToLower(vacancy.Name), "go") {
-				vacancy.Icon = vs.vacancier.checkRelations(vacancy.Relations)
-				listMap[fmt.Sprintf("%s%s", vacancy.PublishedAt, vacancy.Id)] = vacancy
+	{
+		for i := 0; ; i++ {
+			if strings.Contains(s, "similar_vacancies") {
+				link = fmt.Sprintf(s, config.All.Api.ResumeID, i)
+			} else {
+				link = fmt.Sprintf(s, i)
 			}
-		}
-		if vacancies.Pages == i {
-			break
+			ch := make(chan []byte)
+			go vs.requester.doRequest(ctx, link, ch)
+			body := <-ch
+			err := json.Unmarshal(body, &vacancies)
+			if err != nil {
+				log.Println("unmarshalling error")
+			}
+			for _, vacancy := range vacancies.Items {
+				if strings.Contains(strings.ToLower(vacancy.Name), "go") {
+					vacancy.Icon = vs.vacancier.checkRelations(vacancy.Relations)
+					listMap[fmt.Sprintf("%s%s", vacancy.PublishedAt, vacancy.Id)] = vacancy
+				}
+			}
+			if vacancies.Pages == i {
+				break
+			}
 		}
 	}
 	vacanciesSlice := vs.converter.convert(listMap)
+	ch := make(chan error)
+	var err error
+
 	go vs.vacanciesRepo.Redis.ConvertAndSet(ctx, vacanciesSlice)
-	err := vs.vacanciesRepo.Vacancies.Create(ctx, vacanciesSlice)
-	if err != nil {
-		log.Println(err)
+
+	{
+		select {
+		case <-ctx.Done():
+			logger.Log.Warn("context done", "timeout", consts.Timeout)
+		case err = <-ch:
+			if err != nil {
+				logger.Log.Warn("cache setting error", "err", err.Error())
+			}
+		}
 	}
+
+	go func() {
+		err = vs.vacanciesRepo.Vacancies.Create(ctx, vacanciesSlice)
+	}()
+	if err != nil {
+		logger.Log.Warn("error", "error", err.Error())
+	}
+
 	if config.All.Mode == consts.BOT {
 		chV <- vs.messenger.makeMessage(vacanciesSlice)
 	}

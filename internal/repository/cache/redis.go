@@ -2,18 +2,19 @@ package cache
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/go-redis/redis/v8"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/entity"
-	"log"
+	"hh-go-bot/pkg/logger"
 	"time"
 )
 
 func NewRedisClient(addr string, pwd string) *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr:     addr, // адрес вашего Redis-сервера
-		Password: pwd,  // пароль, если он установлен
-		DB:       0,    // индекс базы данных
+		Addr:     addr,
+		Password: pwd,
+		DB:       0,
 	})
 }
 
@@ -27,12 +28,22 @@ func NewRedisService(client *redis.Client) RedisService {
 	}
 }
 
-func (s RedisService) ConvertAndSet(ctx context.Context, value any) {
-	vacancies, ok := value.(entity.Vacancies)
+func (s RedisService) ConvertAndSet(ctx context.Context, v any) {
+	vacancies, ok := v.(entity.Vacancies)
 	if !ok {
-		log.Println("type error")
+		logger.Log.Warn("cannot use this value", "type", ok)
 	}
-	for _, v := range vacancies.Items {
-		s.redis.Set(ctx, v.Id, v, time.Duration(config.All.Redis.Timeout)*time.Hour)
+	for _, vacancy := range vacancies.Items {
+		value, err := json.Marshal(vacancy)
+		if err != nil {
+			logger.Log.Warn("cannot marshal value", "vacancy", value)
+		}
+		s.redis.Set(ctx, vacancy.Id, value, time.Duration(config.All.Redis.Timeout)*time.Hour)
+		logger.Log.Debug("key and value added to cache", "id", vacancy.Id)
 	}
+}
+
+func (s RedisService) Get(ctx context.Context, key string) error {
+	strComm := s.redis.Get(ctx, key)
+	return strComm.Err()
 }
