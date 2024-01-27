@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"hh-go-bot/internal/consts"
-	"log"
 	"net/http"
 )
 
@@ -14,15 +13,12 @@ func (h Handler) initResumeRoutes(api *gin.RouterGroup) {
 }
 
 func (h Handler) Resume(c *gin.Context) {
-	ch := make(chan any)
 	ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 	defer cancel()
-	go h.services.Resumes.MyResume(ctx, ch)
 
-	select {
-	case <-ctx.Done():
-		log.Fatal("timeout")
-	case resumes := <-ch:
-		c.JSON(http.StatusOK, resumes.([]string))
+	resumes, err := h.services.Resume.Get(ctx)
+	if err != nil {
+		c.JSON(http.StatusNoContent, gin.H{"resume getting error": err.Error()})
 	}
+	c.JSON(http.StatusOK, resumes)
 }

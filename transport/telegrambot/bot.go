@@ -2,10 +2,13 @@ package telegrambot
 
 import (
 	"context"
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
+	"hh-go-bot/internal/entity"
 	"hh-go-bot/internal/service"
+	"hh-go-bot/pkg/logger"
 )
 
 type BotAPI interface {
@@ -39,52 +42,94 @@ func (b BotService) GetUpdatesChan(config tgbotapi.UpdateConfig) tgbotapi.Update
 
 func (b BotService) Echo() error {
 	config.All.SetMode(consts.BOT)
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 15
-	updates := b.GetUpdatesChan(u)
-	for update := range updates {
-
+	update := tgbotapi.NewUpdate(0)
+	update.Timeout = 15
+	updates := b.GetUpdatesChan(update)
+	var text []string
+	for u := range updates {
 		ctx, cancel := context.WithTimeout(context.Background(), consts.Timeout)
 		defer cancel()
-		if update.Message == nil {
+		if u.Message == nil {
 			continue
 		}
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		msg := tgbotapi.NewMessage(u.Message.Chat.ID, u.Message.Text)
 		msg.DisableWebPagePreview = true
 
-		ch := make(chan any)
-		switch update.Message.Command() {
+		switch u.Message.Command() {
 
 		case "similar":
-			go b.services.Vacancier.Vacancy(ctx, consts.SimilarVacanciesLink, ch)
+			v, err := b.services.Vacancy.Similar(ctx)
+			if err != nil {
+				logger.Log.Error("similar vacancies getting error", err.Error())
+			}
+			text = VacancyMessage(v)
 
 		case "jobs":
-			go b.services.Vacancier.Vacancy(ctx, consts.AllVacanciesLink, ch)
-
+			v, err := b.services.Vacancy.All(ctx)
+			if err != nil {
+				logger.Log.Error("all vacancies getting error", err.Error())
+			}
+			text = VacancyMessage(v)
 		case "resume":
-			go b.services.Resumes.MyResume(ctx, ch)
+			r, err := b.services.Resume.Get(ctx)
+			if err != nil {
+				logger.Log.Error("resume getting error", err.Error())
+			}
+			text = ResumeMessage(r)
 
 		default:
-			text := []string{"I don't know that command"}
-			ch <- text
+			text = []string{"I don't know that command"}
 		}
-		select {
-		case <-ctx.Done():
-			msg.Text = "20 sec timeout"
+		for _, v := range text {
+			msg.Text = v
 			_, err := b.Send(msg)
 			if err != nil {
-				return err
-			}
-		case raw := <-ch:
-			text := raw.([]string)
-			for _, v := range text {
-				msg.Text = v
-				_, err := b.Send(msg)
-				if err != nil {
-					return err
-				}
+				logger.Log.Warn("cannot send message by bot", "error", err.Error())
 			}
 		}
 	}
 	return nil
+}
+
+func VacancyMessage(vacancies entity.Vacancies) []string {
+	var previousExp, message string
+	var messages []string
+	var vacancyCount int
+	for _, v := range vacancies.Items {
+		if previousExp == "" {
+			message = fmt.Sprintf("%s\n%s: %s\n", message, consts.ReqExp, v.Exp.Name)
+			previousExp = consts.NoExp
+		}
+		if previousExp != v.Exp.ID {
+			messages = append(messages, message)
+			vacancyCount = 0
+			message = fmt.Sprintf("\n%s: %s\n", consts.ReqExp, v.Exp.Name)
+			previousExp = v.Exp.ID
+		}
+		if v.Icon == 0 {
+			message = fmt.Sprintf("%s\n%s | %s - %s", message, v.Employer.Name, v.Name, v.AlternateUrl)
+		} else {
+			message = fmt.Sprintf("%s\n%c%s | %s - %s", message, v.Icon, v.Employer.Name, v.Name, v.AlternateUrl)
+		}
+		vacancyCount++
+		if vacancyCount == 40 {
+			messages = append(messages, message)
+			vacancyCount = 0
+			message = fmt.Sprintf("%s: %s %s\n", consts.ContinuePage, consts.ReqExp, v.Exp.Name)
+		}
+	}
+	if message != "" {
+		messages = append(messages, message)
+		return messages
+	} else {
+		return messages
+	}
+}
+
+func ResumeMessage(r entity.Resume) []string {
+	var text []string
+	for _, v := range r.Items {
+		text = append(text, v.ID)
+	}
+	return text
 }

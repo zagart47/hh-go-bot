@@ -14,7 +14,7 @@ type Vacancy struct {
 	AlternateUrl string     `json:"alternate_url"`
 	Relations    []string   `json:"relations"`
 	Employer     Employer   `json:"employer"`
-	Experience   Experience `json:"experience"`
+	Exp          Experience `json:"experience"`
 }
 type Experience struct {
 	ID   string `json:"id"`
@@ -23,8 +23,10 @@ type Experience struct {
 
 type Vacancies struct {
 	Items        []Vacancy `json:"items"`
+	Page         int       `json:"page"`
 	Pages        int       `json:"pages"`
 	AlternateUrl string    `json:"alternate_url"`
+	Found        int       `json:"found"`
 }
 
 func NewVacancies() Vacancies {

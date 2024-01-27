@@ -7,6 +7,7 @@ import (
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/entity"
 	"hh-go-bot/pkg/logger"
+	"sync"
 	"time"
 )
 
@@ -20,25 +21,33 @@ func NewRedisClient(addr string, pwd string) *redis.Client {
 
 type RedisService struct {
 	redis redis.Client
+	mu    *sync.Mutex
 }
 
 func NewRedisService(client *redis.Client) RedisService {
 	return RedisService{
 		redis: *client,
+		mu:    &sync.Mutex{},
 	}
 }
 
-func (s RedisService) ConvertAndSet(ctx context.Context, v any) {
-	vacancies, ok := v.(entity.Vacancies)
+func (s RedisService) Set(v any) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	vacancy, ok := v.(entity.Vacancy)
 	if !ok {
 		logger.Log.Warn("cannot use this value", "type", ok)
 	}
-	for _, vacancy := range vacancies.Items {
-		value, err := json.Marshal(vacancy)
-		if err != nil {
-			logger.Log.Warn("cannot marshal value", "vacancy", value)
-		}
-		s.redis.Set(ctx, vacancy.Id, value, time.Duration(config.All.Redis.Timeout)*time.Hour)
+
+	value, err := json.Marshal(vacancy)
+	if err != nil {
+		logger.Log.Warn("cannot marshal value", "vacancy", value)
+	}
+
+	status := s.redis.Set(ctx, vacancy.Id, value, time.Duration(config.All.Redis.Timeout)*time.Hour)
+	if status.Err() != nil {
+		logger.Log.Warn("key and value not added to cache", vacancy.Id, status.Err())
+	} else {
 		logger.Log.Debug("key and value added to cache", "id", vacancy.Id)
 	}
 }

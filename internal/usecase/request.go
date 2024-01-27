@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"bytes"
@@ -9,16 +9,16 @@ import (
 	"net/http"
 )
 
-type RequestService struct {
+type RequestUsecase struct {
 	request Requester
 }
 
-func NewRequestService() RequestService {
-	return RequestService{}
+func NewRequestUsecase() RequestUsecase {
+	return RequestUsecase{}
 }
 
-// Do отправляет запросы с bearer токеном
-func (r RequestService) doRequest(_ context.Context, link string, ch chan []byte) {
+// Request отправляет запросы с bearer токеном
+func (r RequestUsecase) Request(ctx context.Context, link string) []byte {
 
 	buffer := bytes.NewBuffer([]byte(`{"key": "value"}`))
 	request, err := http.NewRequest(http.MethodGet, link, buffer)
@@ -38,5 +38,5 @@ func (r RequestService) doRequest(_ context.Context, link string, ch chan []byte
 	}
 
 	defer response.Body.Close()
-	ch <- raw
+	return raw
 }

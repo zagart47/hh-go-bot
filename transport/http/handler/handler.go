@@ -20,8 +20,7 @@ func (h Handler) Init() *gin.Engine {
 	router := gin.Default()
 	api := router.Group("/")
 	{
-		h.initAllVacanciesRoutes(api)
-		h.initSimilarVacanciesRoutes(api)
+		h.initVacanciesRoutes(api)
 		h.initResumeRoutes(api)
 	}
 	return router

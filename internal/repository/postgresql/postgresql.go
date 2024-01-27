@@ -16,9 +16,9 @@ type Client interface {
 	Begin(ctx context.Context) (pgx.Tx, error)
 }
 
-func New() (pool *pgxpool.Pool, err error) {
-	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s", config.All.PostgreSQL.DBName, config.All.PostgreSQL.UserName,
-		config.All.PostgreSQL.Pwd, config.All.PostgreSQL.Host, config.All.PostgreSQL.Port, config.All.PostgreSQL.DBName)
+func New(c config.Cfg) (pool *pgxpool.Pool, err error) {
+	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s", c.PostgreSQL.DBName, c.PostgreSQL.UserName,
+		c.PostgreSQL.Pwd, c.PostgreSQL.Host, c.PostgreSQL.Port, c.PostgreSQL.DBName)
 	pool, err = pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		return

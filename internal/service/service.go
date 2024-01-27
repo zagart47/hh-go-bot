@@ -3,58 +3,29 @@ package service
 import (
 	"context"
 	"hh-go-bot/internal/entity"
-	"hh-go-bot/internal/repository"
+	"hh-go-bot/internal/usecase"
 )
 
-type Vacancier interface {
-	Vacancy(context.Context, string, chan any)
-	checkRelations([]string) rune
+type Vacancy interface {
+	All(context.Context) (entity.Vacancies, error)
+	Similar(context.Context) (entity.Vacancies, error)
 }
 
-type Requester interface {
-	doRequest(context.Context, string, chan []byte)
+type Resume interface {
+	Get(context.Context) (entity.Resume, error)
 }
 
-type Resumes interface {
-	MyResume(context.Context, chan any)
-}
-
-type Messenger interface {
-	makeMessage(entity.Vacancies) []string
-}
-
-type Converter interface {
-	convert(map[string]entity.Vacancy) entity.Vacancies
-}
-
-type User interface {
-	Name() string
-	ID() int64
-}
 type Services struct {
-	Vacancier     Vacancier
-	Requester     Requester
-	Resumes       Resumes
-	Converter     Converter
-	Messenger     Messenger
-	VacanciesRepo repository.Repositories
-	User          User
+	Vacancy Vacancy
+	Resume  Resume
 }
 
-func NewServices(VacanciesRepo repository.Repositories) Services {
-	converterService := NewConverterService()
-	requestService := NewRequestService()
-	messageService := NewMessageService()
-	vacancyService := NewVacancyService(converterService, requestService, messageService, VacanciesRepo)
-	resumeService := NewResumeService(requestService)
-	userService := NewUserService()
+func NewServices() Services {
+	useCases := usecase.NewUsecases()
+	vacancyService := NewVacancyService(useCases)
+	resumeService := NewResumeService(useCases)
 	return Services{
-		Vacancier:     vacancyService,
-		Requester:     requestService,
-		Resumes:       resumeService,
-		Converter:     converterService,
-		Messenger:     messageService,
-		VacanciesRepo: VacanciesRepo,
-		User:          userService,
+		Vacancy: vacancyService,
+		Resume:  resumeService,
 	}
 }
