@@ -19,7 +19,6 @@
 ## Технологии
 - [Golang](https://go.dev/)
 - [PostgreSQL](https://www.postgresql.org/)
-- [SQLite](https://www.sqlite.org/)
 - [Gin](https://github.com/gin-gonic/gin)
 - [Docker](https://www.docker.com/)
 
@@ -48,7 +47,7 @@ docker run --name hh-go-bot -dit --restart unless-stopped -d hh-go-bot
 Для установки и запуска проекта необходим... golang .
 
 ## Contributing
-Если у вас есть предложения или идеи по дополнению проекта или вышли нашли ошибку, то пишите мне в tg: @zagart47
+Если у вас есть предложения или идеи по дополнению проекта или вы нашли ошибку, то пишите мне в tg: @zagart47
 
 ## FAQ
 ### Зачем вы разработали этот проект?
@@ -56,6 +55,7 @@ docker run --name hh-go-bot -dit --restart unless-stopped -d hh-go-bot
 
 ## To do
 - [x] Добавить возможность работать с вакансиями через http
+- [ ] Добавить поддержку web
 - [ ] Добавить поддержку нескольких СУБД
 - [ ] Добавить тесты
 
