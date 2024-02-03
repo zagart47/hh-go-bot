@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/goccy/go-json"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
@@ -22,15 +22,16 @@ const (
 )
 
 type VacancyUsecase struct {
-	vacancy       Vacancy
-	request       RequestUsecase
-	vacanciesRepo repository.Repositories
+	vacancy Vacancy
+	request RequestUsecase
+	repo    repository.Repositories
 }
 
-func NewVacancyUsecase(req RequestUsecase) VacancyUsecase {
+func NewVacancyUsecase(req RequestUsecase, repo repository.Repositories) VacancyUsecase {
 	return VacancyUsecase{
 		vacancy: VacancyUsecase{},
 		request: req,
+		repo:    repo,
 	}
 }
 
@@ -57,7 +58,7 @@ func (vs VacancyUsecase) Get(ctx context.Context, s string) (map[string]entity.V
 		}
 
 		for _, v := range vacancies.Items {
-			v.Icon = vs.vacancy.respondStatus(v.Relations)
+			v.Icon = vs.vacancy.InsertIcon(v.Relations)
 			m[v.Id] = v
 		}
 
@@ -68,8 +69,8 @@ func (vs VacancyUsecase) Get(ctx context.Context, s string) (map[string]entity.V
 	return m, nil
 }
 
-// respondStatus для вставки иконки статуса отклика на вакансию
-func (vs VacancyUsecase) respondStatus(s []string) (r rune) {
+// InsertIcon для вставки иконки статуса отклика на вакансию
+func (vs VacancyUsecase) InsertIcon(s []string) (r rune) {
 	for _, v := range s {
 		switch v {
 		case gotResponse:

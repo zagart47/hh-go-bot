@@ -7,12 +7,6 @@ import (
 	"sort"
 )
 
-const (
-	between1and3 = "between1And3"
-	between3and6 = "between3And6"
-	moreThan6    = "moreThan6"
-)
-
 type SortUsecase struct {
 	Sorter Sorter
 }
@@ -28,7 +22,7 @@ func (p SortUsecase) Sort(ctx context.Context, m map[string]entity.Vacancy) enti
 	for _, k := range m {
 		keys = append(keys, k.Id)
 	}
-	sort.Strings(keys) // pick vacancies by publication date+id
+	sort.Strings(keys) // pick vacancies by publication id
 	for _, k := range keys {
 		if m[k].Exp.ID == consts.NoExp {
 			v.Items = append(v.Items, m[k])
@@ -36,19 +30,19 @@ func (p SortUsecase) Sort(ctx context.Context, m map[string]entity.Vacancy) enti
 		}
 	}
 	for _, k := range keys {
-		if m[k].Exp.ID == between1and3 {
+		if m[k].Exp.ID == consts.Between1and3 {
 			v.Items = append(v.Items, m[k])
 			delete(m, k)
 		}
 	}
 	for _, k := range keys {
-		if m[k].Exp.ID == between3and6 {
+		if m[k].Exp.ID == consts.Between3and6 {
 			v.Items = append(v.Items, m[k])
 			delete(m, k)
 		}
 	}
 	for _, k := range keys {
-		if m[k].Exp.ID == moreThan6 {
+		if m[k].Exp.ID == consts.MoreThan6 {
 			v.Items = append(v.Items, m[k])
 			delete(m, k)
 		}

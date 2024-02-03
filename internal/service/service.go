@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"hh-go-bot/internal/entity"
+	"hh-go-bot/internal/repository"
 	"hh-go-bot/internal/usecase"
 )
 
@@ -20,8 +21,8 @@ type Services struct {
 	Resume  Resume
 }
 
-func NewServices() Services {
-	useCases := usecase.NewUsecases()
+func NewServices(repositories repository.Repositories) Services {
+	useCases := usecase.NewUsecases(repositories)
 	vacancyService := NewVacancyService(useCases)
 	resumeService := NewResumeService(useCases)
 	return Services{

@@ -91,19 +91,24 @@ func (b BotService) Echo() error {
 	return nil
 }
 
+const (
+	ReqExp       = "Требуемый опыт"
+	ContinuePage = "(продолжение)"
+)
+
 func VacancyMessage(vacancies entity.Vacancies) []string {
 	var previousExp, message string
 	var messages []string
 	var vacancyCount int
 	for _, v := range vacancies.Items {
 		if previousExp == "" {
-			message = fmt.Sprintf("%s\n%s: %s\n", message, consts.ReqExp, v.Exp.Name)
+			message = fmt.Sprintf("%s\n%s: %s\n", message, ReqExp, v.Exp.Name)
 			previousExp = consts.NoExp
 		}
 		if previousExp != v.Exp.ID {
 			messages = append(messages, message)
 			vacancyCount = 0
-			message = fmt.Sprintf("\n%s: %s\n", consts.ReqExp, v.Exp.Name)
+			message = fmt.Sprintf("\n%s: %s\n", ReqExp, v.Exp.Name)
 			previousExp = v.Exp.ID
 		}
 		if v.Icon == 0 {
@@ -115,7 +120,7 @@ func VacancyMessage(vacancies entity.Vacancies) []string {
 		if vacancyCount == 40 {
 			messages = append(messages, message)
 			vacancyCount = 0
-			message = fmt.Sprintf("%s: %s %s\n", consts.ContinuePage, consts.ReqExp, v.Exp.Name)
+			message = fmt.Sprintf("%s: %s %s\n", ContinuePage, ReqExp, v.Exp.Name)
 		}
 	}
 	if message != "" {

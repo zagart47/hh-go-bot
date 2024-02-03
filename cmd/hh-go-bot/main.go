@@ -6,6 +6,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
+	"hh-go-bot/internal/repository"
+	"hh-go-bot/internal/repository/cache"
+	"hh-go-bot/internal/repository/postgresql"
 	"hh-go-bot/internal/service"
 	"hh-go-bot/pkg/logger"
 	"hh-go-bot/transport/http"
@@ -15,7 +18,7 @@ import (
 )
 
 func main() {
-	/*redisClient := cache.NewRedisClient(config.All.Redis.Host, config.All.Redis.Pwd)
+	redisClient := cache.NewRedisClient(config.All.Redis.Host, config.All.Redis.Pwd)
 	redisService := cache.NewRedisService(redisClient)
 	logger.Log.Info("redis client added", "address", config.All.Redis.Host)
 
@@ -24,11 +27,11 @@ func main() {
 	if err != nil {
 		logger.Log.Error("repo creating error", "error", err)
 		os.Exit(1)
-	}*/
+	}
 
-	services := service.NewServices()
+	services := service.NewServices(repos)
 
-	f := flag.String("d", "bot", "delivery using")
+	f := flag.String("d", "http", "delivery using")
 	flag.Parse()
 	logger.Log.Info("starting application", "mode", f)
 

@@ -8,7 +8,7 @@ import (
 
 type Vacancy interface {
 	Get(context.Context, string) (map[string]entity.Vacancy, error)
-	respondStatus([]string) rune
+	InsertIcon([]string) rune
 }
 
 type Requester interface {
@@ -37,9 +37,9 @@ type Usecases struct {
 	Sorter        Sorter
 }
 
-func NewUsecases() Usecases {
+func NewUsecases(repositories repository.Repositories) Usecases {
 	requestUsecase := NewRequestUsecase()
-	vacancyUsecase := NewVacancyUsecase(requestUsecase)
+	vacancyUsecase := NewVacancyUsecase(requestUsecase, repositories)
 	resumeUsecase := NewResumeUsecase(requestUsecase)
 	userUsecase := NewUserUsecase()
 	sortUsecase := NewSortUsecase()

@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/goccy/go-json"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
 )
@@ -20,7 +20,7 @@ func NewResumeUsecase(s RequestUsecase) ResumeUsecase {
 	}
 }
 
-// Get нужен для получения id моего резюме для поиска подходящих вакансий
+// GetResume нужен для получения id моего резюме для поиска подходящих вакансий
 func (r ResumeUsecase) GetResume(ctx context.Context) (entity.Resume, error) {
 	resumes := entity.NewResume()
 	go r.request.Request(ctx, consts.ResumeLink)
