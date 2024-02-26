@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	tele "gopkg.in/telebot.v3"
 	"hh-go-bot/internal/config"
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/repository"
@@ -14,7 +14,9 @@ import (
 	"hh-go-bot/transport/http"
 	"hh-go-bot/transport/http/handler"
 	"hh-go-bot/transport/telegrambot"
+	"hh-go-bot/transport/telegrambot/bothandler"
 	"os"
+	"time"
 )
 
 func main() {
@@ -31,24 +33,21 @@ func main() {
 
 	services := service.NewServices(repos)
 
-	f := flag.String("d", "http", "delivery using")
+	f := flag.String("d", "bot", "delivery using")
 	flag.Parse()
 	logger.Log.Info("starting application", "mode", f)
 
 	switch *f {
 	case consts.BOT:
-		bot, err := tgbotapi.NewBotAPI(config.All.Bot.Token)
-		if err != nil {
-			logger.Log.Error("new botapi creating error", "error", err.Error())
+		pref := tele.Settings{
+			Token:  config.All.Bot.Token,
+			Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 		}
-		bot.Debug = true
+		b := telegrambot.NewBotService(pref, services)
+		s := bothandler.NewHandler(b)
+		s.Init()
+		b.Bot.Start()
 
-		bs := telegrambot.NewBotService(bot, services)
-		err = bs.Echo()
-		if err != nil {
-			logger.Log.Error("bot starting error", "error", err.Error())
-			os.Exit(1)
-		}
 	case consts.HTTP:
 		handlers := handler.NewHandler(services)
 		logger.Log.Info("handlers initialized")

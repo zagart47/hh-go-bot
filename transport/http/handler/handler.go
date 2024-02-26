@@ -22,6 +22,7 @@ func (h Handler) Init() *gin.Engine {
 	{
 		h.initVacanciesRoutes(api)
 		h.initResumeRoutes(api)
+		h.initAuthRoutes(api)
 	}
 	return router
 }
