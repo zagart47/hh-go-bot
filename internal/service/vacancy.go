@@ -5,11 +5,20 @@ import (
 	"hh-go-bot/internal/consts"
 	"hh-go-bot/internal/entity"
 	"hh-go-bot/internal/usecase"
+	"hh-go-bot/pkg/logger"
 )
 
 type VacancyService struct {
 	vacancy Vacancy
 	usecase usecase.Usecases
+}
+
+func (s VacancyService) One(ctx context.Context, id string) (entity.Vacancy, error) {
+	m, err := s.usecase.Vacancy.GetOne(ctx, id)
+	if err != nil {
+		logger.Log.Error("vacancy getting error", err.Error())
+	}
+	return m, nil
 }
 
 func NewVacancyService(usecase usecase.Usecases) VacancyService {
@@ -20,7 +29,7 @@ func NewVacancyService(usecase usecase.Usecases) VacancyService {
 }
 
 func (s VacancyService) All(ctx context.Context) (entity.Vacancies, error) {
-	m, err := s.usecase.Vacancy.Get(ctx, consts.AllVacanciesLink)
+	m, err := s.usecase.Vacancy.GetAll(ctx, consts.AllVacanciesLink)
 	if err != nil {
 		return entity.Vacancies{}, err
 	}
@@ -29,7 +38,7 @@ func (s VacancyService) All(ctx context.Context) (entity.Vacancies, error) {
 }
 
 func (s VacancyService) Similar(ctx context.Context) (entity.Vacancies, error) {
-	m, err := s.usecase.Vacancy.Get(ctx, consts.SimilarVacanciesLink)
+	m, err := s.usecase.Vacancy.GetAll(ctx, consts.SimilarVacanciesLink)
 	if err != nil {
 		return entity.Vacancies{}, err
 	}

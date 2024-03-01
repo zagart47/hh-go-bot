@@ -9,7 +9,8 @@ import (
 type Cfg struct {
 	Mode string
 	Bot  struct {
-		Token string `yaml:"token"`
+		Token       string `yaml:"token"`
+		RespondText string `yaml:"respond_text"`
 	} `yaml:"bot"`
 	HTTP struct {
 		Host string `yaml:"host"`

@@ -7,15 +7,15 @@ import (
 )
 
 func (b *Bot) Resume(c tele.Context) error {
-	r, err := b.bot.Services.Resume.Get(context.Background())
-	if r.Items == nil {
+	resume, err := b.Services.Resume.Get(context.Background())
+	if resume.Items == nil {
 		return c.Send("У тебя нет видимых резюме")
 	}
 	if err != nil {
 		return err
 	}
-	for _, vacs := range ResumeMessage(r) {
-		err = c.Send(vacs, &tele.SendOptions{DisableWebPagePreview: true})
+	for _, r := range ResumeMessage(resume) {
+		err = c.Send(r, &tele.SendOptions{DisableWebPagePreview: true})
 		if err != nil {
 			return err
 		}

@@ -44,8 +44,8 @@ func main() {
 			Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 		}
 		b := telegrambot.NewBotService(pref, services)
-		s := bothandler.NewHandler(b)
-		s.Init()
+		h := bothandler.NewHandler(b)
+		h.Init()
 		b.Bot.Start()
 
 	case consts.HTTP:

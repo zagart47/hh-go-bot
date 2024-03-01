@@ -35,7 +35,20 @@ func NewVacancyUsecase(req RequestUsecase, repo repository.Repositories) Vacancy
 	}
 }
 
-func (vs VacancyUsecase) Get(ctx context.Context, s string) (map[string]entity.Vacancy, error) {
+func (vs VacancyUsecase) GetOne(ctx context.Context, s string) (entity.Vacancy, error) {
+	vacancy := entity.NewVacancy()
+	link := fmt.Sprintf(consts.OneVacancyLink, s)
+	body := vs.request.Request(ctx, link)
+	err := json.Unmarshal(body, &vacancy)
+	if err != nil {
+		logger.Log.Warn("unmarshalling error", err.Error())
+		return entity.Vacancy{}, err
+	}
+	vacancy.Icon = vs.InsertIcon(vacancy.Relations)
+	return vacancy, err
+}
+
+func (vs VacancyUsecase) GetAll(ctx context.Context, s string) (map[string]entity.Vacancy, error) {
 	var m map[string]entity.Vacancy
 	vacancies := entity.NewVacancies()
 	var link string

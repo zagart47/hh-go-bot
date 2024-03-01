@@ -6,16 +6,23 @@ type Employer struct {
 
 type Vacancy struct {
 	Icon         rune
-	Id           string     `json:"id"`
-	Name         string     `json:"name"`
-	PublishedAt  string     `json:"published_at"`
-	CreatedAt    string     `json:"created_at"`
-	Archived     bool       `json:"archived"`
-	AlternateUrl string     `json:"alternate_url"`
-	Relations    []string   `json:"relations"`
-	Employer     Employer   `json:"employer"`
-	Exp          Experience `json:"experience"`
+	Id           string      `json:"id"`
+	Name         string      `json:"name"`
+	PublishedAt  string      `json:"published_at"`
+	CreatedAt    string      `json:"created_at"`
+	Archived     bool        `json:"archived"`
+	AlternateUrl string      `json:"alternate_url"`
+	Relations    []string    `json:"relations"`
+	Employer     Employer    `json:"employer"`
+	Exp          Experience  `json:"experience"`
+	KeySkills    []KeySkills `json:"key_skills"`
+	Description  string      `json:"description"`
 }
+
+type KeySkills struct {
+	Name string `json:"name"`
+}
+
 type Experience struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -31,4 +38,8 @@ type Vacancies struct {
 
 func NewVacancies() Vacancies {
 	return Vacancies{}
+}
+
+func NewVacancy() Vacancy {
+	return Vacancy{}
 }

@@ -7,7 +7,8 @@ import (
 )
 
 type Vacancy interface {
-	Get(context.Context, string) (map[string]entity.Vacancy, error)
+	GetAll(context.Context, string) (map[string]entity.Vacancy, error)
+	GetOne(context.Context, string) (entity.Vacancy, error)
 	InsertIcon([]string) rune
 }
 
@@ -26,6 +27,8 @@ type Sorter interface {
 type User interface {
 	Name() string
 	ID() int64
+	Register()
+	Login()
 }
 
 type Usecases struct {

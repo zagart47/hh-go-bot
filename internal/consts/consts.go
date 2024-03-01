@@ -7,9 +7,11 @@ const (
 	HTTP                  = "http"
 	Timeout time.Duration = 9999999
 
+	OneVacancyLink       = "https://api.hh.ru/vacancies/%s"
 	AllVacanciesLink     = "https://api.hh.ru/vacancies?text=golang&area=113&order_by=publication_time&search_field=name&per_page=100&page=%d"
 	SimilarVacanciesLink = "https://api.hh.ru/resumes/%s/similar_vacancies?per_page=%d&page=%d&id=publication_time"
 	ResumeLink           = "https://api.hh.ru/resumes/mine"
+	RespondLink          = "https://api.hh.ru/negotiations"
 
 	NoExp        = "noExperience"
 	Between1and3 = "between1And3"

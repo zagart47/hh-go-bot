@@ -19,6 +19,5 @@ postgreSQL:
 
 redis:
   host:
-  port:
   pwd:
   timeout:
